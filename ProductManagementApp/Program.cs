@@ -15,6 +15,8 @@ namespace ProductManagementApp
                 Console.WriteLine("2.View All Products");
                 Console.WriteLine("3.Update Product");
                 Console.WriteLine("4.Delete Product");
+                Console.WriteLine("5.Search product by name");
+                Console.WriteLine("6.Search for products with stock lower than:");
                 Console.WriteLine("0.Exit");
                 Console.WriteLine("Select an option:");
                 string option = Console.ReadLine();
@@ -52,6 +54,20 @@ namespace ProductManagementApp
                                 await Delete(id);
                                 break;
                             }
+                        case "5":
+                            {
+                                Console.WriteLine("Enter the name of the product:");
+                                string name = Console.ReadLine();
+                                await SearchProductByName(name);
+                                break;
+                            }
+                        case "6":
+                            {
+                                Console.WriteLine("Enter the value for stock:");
+                                int stock = int.Parse(Console.ReadLine());
+                                await StockLower(stock);
+                                break;
+                            }
                         case "0":
                             {
                                 return;
@@ -65,6 +81,38 @@ namespace ProductManagementApp
                     option = Console.ReadLine();
                 }
             }
+        }
+
+        private static async Task StockLower(int stock)
+        {
+            var products = await context.Products.Where(q => q.Stock <= stock).ToListAsync();
+            if (products.Any())
+            {
+                Console.WriteLine("All products with lower stock:");
+                foreach (var product in products)
+                {
+                    Console.WriteLine($"{product.Id}. {product.Name} {product.Price} {product.Stock}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No products meet the criteria");
+            }
+        }
+
+        private static async Task SearchProductByName(string? name)
+        {
+            var product = await context.Products.FirstOrDefaultAsync(q => q.Name == name);
+            if(product!=null)
+            {
+                Console.WriteLine($"{product.Id}. {product.Name} {product.Price} {product.Stock}");
+            }
+            else
+            {
+                Console.WriteLine("Such product is not found.");
+            }
+
+            
         }
 
         private static async Task Delete(int id)
